@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 
+import api from './services/api';
+
 import './global.css';
 import './App.css';
 import './Sidebar.css';
 import './Main.css'
 
 function App() {
+  const [devs, setDevs] = useState([]);
+
   const [github_username, setGithubUsername] = useState('');
   const [techs, setTechs] = useState('');
   const [latitude, setLatitude] = useState('');
@@ -31,10 +35,31 @@ function App() {
     )
   }, []);
 
+  useEffect(() => {
+    async function loadDevs() {
+      const response = await api.get('/devs');
+
+      setDevs(response.data);
+
+    }
+
+    loadDevs();
+  }, []);
+
   async function handleSubmit(e) {
     e.preventDefault();
 
-    
+    const response = await api.post('/devs', {
+      github_username,
+      techs,
+      latitude,
+      longitude,
+    });
+
+    setGithubUsername('');
+    setTechs('');
+
+    setDevs([...devs, response.data]);
   }
 
   return (
@@ -97,75 +122,23 @@ function App() {
 
       <main>
         <ul>
-          <li className="dev-item">
-            <header>
-              <img src="https://avatars3.githubusercontent.com/u/30740305?s=460&u=0edb35254172e05ca713bd3862aa983d34e9320d&v=4" alt="claudio pereira" />
+          {devs.map(dev => (
+            <li key={dev._id} className="dev-item">
+              <header>
+                <img src={dev.avatar_url} alt={dev.name} />
 
-              <div className="user-info">
-                <strong>Claudio Pereira</strong>
-                <span>ReactJS, React Native, Node.js</span>
-              </div>
-            </header>
+                <div className="user-info">
+                  <strong>{dev.name}</strong>
+                  <span>{dev.techs.join(', ')}</span>
+                </div>
+              </header>
 
-            <p>CTO da @Rocketseat. Apaixonado pelas melhores tecnologias de desenvolvimento web e mobile</p>
-            <a href="https://github.com/claudiofrancopereira">Acessar perfil no Github</a>
-          </li>
-
-          <li className="dev-item">
-            <header>
-              <img src="https://avatars3.githubusercontent.com/u/30740305?s=460&u=0edb35254172e05ca713bd3862aa983d34e9320d&v=4" alt="claudio pereira" />
-
-              <div className="user-info">
-                <strong>Claudio Pereira</strong>
-                <span>ReactJS, React Native, Node.js</span>
-              </div>
-            </header>
-
-            <p>CTO da @Rocketseat. Apaixonado pelas melhores tecnologias de desenvolvimento web e mobile</p>
-            <a href="https://github.com/claudiofrancopereira">Acessar perfil no Github</a>
-          </li>
-
-          <li className="dev-item">
-            <header>
-              <img src="https://avatars3.githubusercontent.com/u/30740305?s=460&u=0edb35254172e05ca713bd3862aa983d34e9320d&v=4" alt="claudio pereira" />
-
-              <div className="user-info">
-                <strong>Claudio Pereira</strong>
-                <span>ReactJS, React Native, Node.js</span>
-              </div>
-            </header>
-
-            <p>CTO da @Rocketseat. Apaixonado pelas melhores tecnologias de desenvolvimento web e mobile</p>
-            <a href="https://github.com/claudiofrancopereira">Acessar perfil no Github</a>
-          </li>
-
-          <li className="dev-item">
-            <header>
-              <img src="https://avatars3.githubusercontent.com/u/30740305?s=460&u=0edb35254172e05ca713bd3862aa983d34e9320d&v=4" alt="claudio pereira" />
-
-              <div className="user-info">
-                <strong>Claudio Pereira</strong>
-                <span>ReactJS, React Native, Node.js</span>
-              </div>
-            </header>
-
-            <p>CTO da @Rocketseat. Apaixonado pelas melhores tecnologias de desenvolvimento web e mobile</p>
-            <a href="https://github.com/claudiofrancopereira">Acessar perfil no Github</a>
-          </li>
-
-          <li className="dev-item">
-            <header>
-              <img src="https://avatars3.githubusercontent.com/u/30740305?s=460&u=0edb35254172e05ca713bd3862aa983d34e9320d&v=4" alt="claudio pereira" />
-
-              <div className="user-info">
-                <strong>Claudio Pereira</strong>
-                <span>ReactJS, React Native, Node.js</span>
-              </div>
-            </header>
-
-            <p>CTO da @Rocketseat. Apaixonado pelas melhores tecnologias de desenvolvimento web e mobile</p>
-            <a href="https://github.com/claudiofrancopereira">Acessar perfil no Github</a>
-          </li>
+              <p>{dev.bio ? dev.bio : 'Sem biografia'}</p>
+              <a href={`https://github.com/${dev.github_username}`}>Acessar perfil no Github</a>
+            </li>
+          ))}
+          
+          
         </ul>
       </main>
     </div>
