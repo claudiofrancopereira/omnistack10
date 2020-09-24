@@ -19,8 +19,6 @@ module.exports = {
 
             const { name = login, avatar_url, bio } = apiResponse.data;
     
-            console.log(name, avatar_url, bio, github_username)
-    
             const techsArray = parseStringAsArray(techs);
     
             const location = {
